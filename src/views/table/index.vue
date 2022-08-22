@@ -45,7 +45,6 @@
 
 <script>
 import { getList } from '@/api/table'
-
 export default {
   filters: {
     statusFilter(status) {
@@ -56,6 +55,8 @@ export default {
       }
       return statusMap[status]
     }
+  },
+  components: {
   },
   data() {
     return {

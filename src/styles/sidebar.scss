@@ -5,6 +5,9 @@
     transition: margin-left .28s;
     margin-left: $sideBarWidth;
     position: relative;
+    overflow: auto;
+    max-height: calc( 100vh - 60px);
+    background-color: aqua;
   }
 
   .sidebar-container {
@@ -14,7 +17,7 @@
     height: 100%;
     position: fixed;
     font-size: 0px;
-    top: 0;
+    top: 60px;
     bottom: 0;
     left: 0;
     z-index: 1001;
