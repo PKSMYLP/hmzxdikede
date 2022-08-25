@@ -44,6 +44,7 @@
 </template>
 
 <script>
+
 import { Sidebar, AppMain } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 
@@ -73,14 +74,19 @@ export default {
       }
     }
   },
+  created() {
+
+  },
   methods: {
     handleClickOutside() {
       this.$store.dispatch('app/closeSideBar', { withoutAnimation: false })
     },
     // 退出
-    logout() {
+    async logout() {
       console.log(1)
+      await this.$store.dispatch('user/logout')
       this.$router.push('/login')
+      console.log(this.$store)
     }
   }
 }

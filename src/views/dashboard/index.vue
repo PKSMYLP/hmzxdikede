@@ -1,18 +1,19 @@
 <template>
   <div class="dashboard-container">
-    1111
-    <div class="dashboard-text">name: {{ name }}</div>
-    <myPagination :total="total" :current-page="currentPage" @changePage="change" />
+    主页
+    <!-- 分页组件 -->
+    <!-- <myPagination :total="total" :current-page="currentPage" @changePage="change" /> -->
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-import myPagination from '@/components/myPagination'
+
+// import myPagination from '@/components/myPagination'
 export default {
   name: 'Dashboard',
   components: {
-    myPagination
+    // myPagination
   },
   data() {
     return {
@@ -25,6 +26,7 @@ export default {
       'name'
     ])
   },
+
   methods: {
     change(val) {
       this.currentPage = val
@@ -36,7 +38,7 @@ export default {
 <style lang="scss" scoped>
 .dashboard {
   &-container {
-    margin: 30px;
+    margin:0, 30px,30px;
   }
   &-text {
     font-size: 30px;

@@ -23,7 +23,7 @@ export default {
   max-height: calc(100vh - 60px);
   width: 100%;
   position: relative;
-  overflow: auto;
+  /* overflow: auto; */
 }
 .fixed-header+.app-main {
   padding-top: 60px;

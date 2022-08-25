@@ -30,7 +30,7 @@
       </el-form-item>
       <!-- 验证码 -->
       <div class="code el-row">
-        <el-form-item class=" el-col el-col-15">
+        <el-form-item class=" el-col el-col-15" prop="code">
           <span class="svg-container">
             <svg-icon icon-class="password" />
           </span>
@@ -65,7 +65,8 @@ export default {
       },
       loginRules: {
         loginName: [{ required: true, trigger: 'blur' }],
-        password: [{ required: true, trigger: 'blur' }]
+        password: [{ required: true, trigger: 'blur' }],
+        code: [{ required: true, trigger: 'blur', message: '请输入验证码' }]
       },
       loading: false,
       passwordType: 'password',
@@ -105,6 +106,7 @@ export default {
     async getCode() {
       this.loginForm.clientToken = Math.random()
       const res = await verificationCodeApi(this.loginForm.clientToken)
+      // this.imgUrl = res.config.url
       this.imgUrl = window.URL.createObjectURL(res.data)
     }
   }
