@@ -1,5 +1,7 @@
 <template>
-  <div>设备管理</div>
+  <div>
+    1
+  </div>
 </template>
 
 <script>

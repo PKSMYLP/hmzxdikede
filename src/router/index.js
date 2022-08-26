@@ -1,13 +1,13 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import task from './components/task'
-import vm from './components/vm'
-import node from './components/node'
-import order from './components/order'
-import policy from './components/policy'
-import report from './components/report'
-import sku from './components/sku'
-import user from './components/user'
+import task from './modules/task'
+import vm from './modules/vm'
+import node from './modules/node'
+import order from './modules/order'
+import policy from './modules/policy'
+import report from './modules/report'
+import sku from './modules/sku'
+import user from './modules/user'
 Vue.use(Router)
 
 const asyncRoutes = [task, node, vm, user, sku, policy, order, report]

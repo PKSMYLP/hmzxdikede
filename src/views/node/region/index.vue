@@ -1,5 +1,7 @@
 <template>
-  <div>工单管理</div>
+  <div>
+    1
+  </div>
 </template>
 
 <script>
@@ -24,6 +26,6 @@ export default {
   }
 }
 </script>
-<style scoped lang="scss">
+<style scoped>
 
 </style>

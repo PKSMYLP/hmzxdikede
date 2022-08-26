@@ -1,5 +1,7 @@
 <template>
-  <div>商品管理</div>
+  <div>
+    1
+  </div>
 </template>
 
 <script>

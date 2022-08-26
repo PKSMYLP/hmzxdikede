@@ -5,7 +5,7 @@ import axios from 'axios'
 import { Message } from 'element-ui'
 
 // 设置token 有效时间
-const timeOut = 10
+const timeOut = 3600
 // 定义token超时函数
 // const tokenTimeOut = () => {
 //   return (+new Date() - store.getters.loginTime) / 1000 > timeOut1
