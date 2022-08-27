@@ -26,7 +26,7 @@ export default {
     async login({ commit }, data) {
       const res = await loginApi(data)
       console.log(res)
-      commit('Token', res)
+      commit('Token', res.data.token)
       commit('setLoginTime', +new Date())
     },
     // 退出

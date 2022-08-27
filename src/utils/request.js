@@ -32,7 +32,7 @@ service.interceptors.request.use(config => {
       // Message.error('token过期了')
       return Promise.reject(new Error('token过期了'))
     }
-    config.headers['Authorization'] = `Bearer ${store.getters.token}`
+    config.headers['Authorization'] = `${store.getters.token}`
   }
   return config // 必须返回配置
 }, error => {
