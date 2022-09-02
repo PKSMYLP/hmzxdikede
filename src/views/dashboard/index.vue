@@ -3,6 +3,19 @@
     主页
     <!-- 分页组件 -->
     <!-- <myPagination :total="total" :current-page="currentPage" @changePage="change" /> -->
+
+    <el-form ref="form" :model="form" label-width="80px">
+      <el-form-item label="活动名称" prop="c">
+        <el-select v-model="form.c" placeholder="请选择">
+          <el-option
+            v-for="item in list"
+            :key="item.value"
+            :label="item.a"
+            :value="item.b"
+          />
+        </el-select>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
@@ -18,7 +31,14 @@ export default {
   data() {
     return {
       total: 30,
-      currentPage: 1
+      currentPage: 1,
+      form: {
+        c: '',
+        d: ''
+      },
+      list: [
+        { a: '大', b: 2 }, { a: '啊啊', b: 4 }
+      ]
     }
   },
   computed: {

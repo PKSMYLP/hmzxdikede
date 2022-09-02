@@ -4,33 +4,39 @@
 
       <!-- 定义前面得插槽 -->
       <!-- <slot name="before" /> -->
-      <el-form :inline="true" :model="formInline" class="demo-form-inline">
-        <el-form-item label="工单编号:">
-          <el-input v-model="formInline.user" placeholder="请输入" />
+      <el-form :inline="true" :model="form" class="demo-form-inline">
+        <el-form-item label="工单编号:" prop="taskCode">
+          <el-input v-model="form.taskCode" placeholder="请输入" />
         </el-form-item>
-        <el-form-item label="工单状态:">
-          <el-select v-model="formInline.region" placeholder="请选择">
-            <el-option label="区域一" value="shanghai" />
-            <el-option label="区域二" value="beijing" />
+        <el-form-item label="工单状态:" prop="status">
+          <el-select v-model="form.status" placeholder="请选择">
+            <el-option v-for="item in allTaskStatusList" :key="item.statusId" :label="item.statusName" :value="item.statusId" />
           </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" icon="el-icon-search" @click="onSubmit">搜索</el-button>
-        </el-form-item>
-      </el-form>
+          <el-form-item>
+            <el-button type="primary" icon="el-icon-search" @click="onSubmit">搜索</el-button>
+          </el-form-item>
+        </el-form-item></el-form>
     </el-row>
   </el-card>
 </template>
 
 <script>
+
 export default {
   name: 'MyHeader',
   components: {},
+  props: {
+    allTaskStatusList: {
+      type: Array,
+      default: () => []
+    }
+  },
   data() {
     return {
-      formInline: {
-        user: '',
-        region: ''
+
+      form: {
+        taskCode: '',
+        status: ''
       }
     }
   },
@@ -40,11 +46,10 @@ export default {
 
   },
   mounted() {
-
   },
   methods: {
     onSubmit() {
-      console.log('submit!')
+      this.$emit('submit', this.form)
     }
   }
 

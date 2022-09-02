@@ -50,6 +50,10 @@ service.interceptors.response.use(
       Message.error(res.data.msg)
       return Promise.reject(new Error(res.data.msg))
     }
+  }, error => {
+    const res = error.response.data
+    console.log(res, 1)
+    return Promise.reject(error) // 返回执行错误 让当前的执行链跳出成功 直接进入 catch
   }
 )
 
