@@ -17,7 +17,7 @@
 
 export default {
   name: '',
-  components: { },
+  components: {},
   props: {
     list: {
       type: Array,
@@ -43,5 +43,4 @@ export default {
 }
 </script>
 <style scoped lang="scss">
-
 </style>
