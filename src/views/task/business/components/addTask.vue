@@ -57,7 +57,7 @@
           width="80"
         />
         <el-table-column
-          prop="sku.skuName"
+          prop="skuName"
           label="商品名称"
           width="100"
         />
@@ -67,7 +67,7 @@
           width="100"
         />
         <el-table-column
-          prop="num"
+          prop="addCapacity"
           label="还可添加"
           width="100"
         />
@@ -76,8 +76,9 @@
           width="200"
         >
           <template slot-scope="{row}">
-            <el-input-number v-model="row.execptCapacity" controls-position="right" :min="row.currentCapacity" :max="row.maxCapacity-row.currentCapacity" />
 
+            <el-input-number v-if="row.sku" v-model="row.expectCapacity" controls-position="right" :min="0" :max="row.addCapacity" />
+            <span v-else>货道暂无商品</span>
           </template>
         </el-table-column>
       </el-table>
@@ -113,7 +114,8 @@ export default {
         createType: 1, // 创建类型
         userId: 1, // 用户id
         productType: null, // 工单类型
-        assignorId: ''
+        assignorId: '',
+        details: []
       },
       options: [{
         value: 2,
@@ -130,35 +132,36 @@ export default {
       dialogVisible1: false, // 补货详情对话框
       list1: [], // 补货详情列表
       addnum: {
-        num: null,
-        execptCapacity: ''
+        expectCapacity: '',
+        skuName: '',
+        addCapacity: ''
       }, // 可添加数量
       isChange: false,
       list2: []
     }
   },
-  computed: {
-    details1() {
-      return this.list2.filter(ele => {
-        if (this.isChange) {
-          ele.skuImage = ele.sku?.skuImage
-          ele.skuName = ele.sku?.skuName
-          delete ele.channelId
-          delete ele.createTime
-          delete ele.currentCapacity
-          delete ele.innerCode
-          delete ele.lastSupplyTime
-          delete ele.maxCapacity
-          delete ele.price
-          delete ele.sku
-          delete ele.updateTime
-          delete ele.vmId
-          delete ele.num
-          return ele
-        }
-      })
-    }
-  },
+  // computed: {
+  //   details() {
+  //     return this.list2.filter(ele => ele.sku !== null).map(ele => {
+  //       if (this.isChange) {
+  //         ele.skuImage = ele.sku?.skuImage
+  //         delete ele.channelId
+  //         delete ele.createTime
+  //         delete ele.currentCapacity
+  //         delete ele.innerCode
+  //         delete ele.lastSupplyTime
+  //         delete ele.maxCapacity
+  //         delete ele.price
+  //         delete ele.sku
+  //         delete ele.updateTime
+  //         delete ele.vmId
+  //         delete ele.num
+  //         delete ele.addCapacity
+  //         return ele
+  //       }
+  //     })
+  //   }
+  // },
   watch: {},
   created() {
   },
@@ -180,7 +183,8 @@ export default {
         productType: null, // 工单类型
         assignorId: ''
       }
-      // 重新刷新
+      //
+      // this.operatorList = []
     },
     // 关闭补货详情对话框
     handleClose1() {
@@ -190,10 +194,11 @@ export default {
     // 新增
     async submit() {
       try {
-        const details = this.details1
-        console.log(1)
-        const res = await addListItemApi({ ...this.form, details })
-        console.log(res)
+        // console.log(this.details1, 1111)
+        // const details = this.details1
+        // console.log(1)
+        await addListItemApi(this.form)
+        // console.log(res)
         this.isChange = false
         this.$message.success('新增工单成功')
         // 触发父组件重新刷新
@@ -207,13 +212,34 @@ export default {
     // 补货详情
     submit1() {
       this.isChange = true
+      this.form.details = this.list2.filter(ele => ele.sku !== null).map(ele => {
+        if (this.isChange) {
+          ele.skuImage = ele.sku?.skuImage
+          delete ele.channelId
+          delete ele.createTime
+          delete ele.currentCapacity
+          delete ele.innerCode
+          delete ele.lastSupplyTime
+          delete ele.maxCapacity
+          delete ele.price
+          delete ele.sku
+          delete ele.updateTime
+          delete ele.vmId
+          delete ele.num
+          delete ele.addCapacity
+          return ele
+        }
+      })
       this.handleClose1()
     },
     // 获取运营人员列表
     async getoperatorList() {
       try {
-        const res = await operatorList(this.form.innerCode)
-        this.operatorList = res.data
+        if (this.form.innerCode) {
+          const res = await operatorList(this.form.innerCode)
+          this.operatorList = res.data
+          // console.log(2)
+        }
       } catch (error) {
         console.log(error)
       }
@@ -221,18 +247,29 @@ export default {
     // 补货清单
     async channelList() {
       try {
-        this.dialogVisible1 = true
-        const res = await channelListApi(this.form.innerCode)
-        this.list1 = res.data
-
-        this.list1 = this.list1.map(ele => {
-          this.addnum.num = ele.maxCapacity - ele.currentCapacity
-          this.addnum.execptCapacity = this.addnum.num
-          return { ...ele, ...this.addnum }
-        })
-        this.list2 = this.list1
-        // console.log(this.list1, 1)
-        // console.log(res)
+        if (this.form.innerCode) {
+          this.dialogVisible1 = true
+          const res = await channelListApi(this.form.innerCode)
+          // console.log(res)
+          this.list1 = res.data
+          // console.log(1)
+          // console.log(this.list1, 123456)
+          this.list1 = this.list1.map(ele => {
+            if (ele.sku === null) {
+              ele.currentCapacity = '-'
+              this.addnum.skuName = '-'
+              this.addnum.addCapacity = '-'
+              return { ...ele, ...this.addnum }
+            } else {
+              this.addnum.addCapacity = ele.maxCapacity - ele.currentCapacity
+              this.addnum.skuName = ele.sku?.skuName
+              this.addnum.expectCapacity = this.addnum.addCapacity
+              return { ...ele, ...this.addnum }
+            }
+          })
+          this.list2 = this.list1
+          // console.log(this.list2)
+        }
       } catch (error) {
         console.log(error.response.data)
       }

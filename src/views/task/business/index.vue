@@ -9,7 +9,7 @@
       <!-- 工单配置 -->
       <template slot="after">
         <!-- 新增按钮 -->
-        <el-button type="warning" icon="el-icon-circle-plus-outline" style="margin-right: 10px" @click="add">新建</el-button>
+        <el-button type="warning" icon="el-icon-circle-plus-outline" style="margin-right: 10px" @click="add(1)">新建</el-button>
         <el-button type="info" @click="supplyAlertValue">工单配置</el-button>
       </template>
       <!-- 表单 -->
@@ -21,32 +21,32 @@
           <el-table-column
             type="index"
             label="序号"
-            width="60"
+            width="100"
           />
           <el-table-column
             prop="taskCode"
             label="工单编号"
-            width="140"
+            width="160"
           />
           <el-table-column
             prop="innerCode"
             label="设备编号"
-            width="140"
+            width="160"
           />
           <el-table-column
             prop="taskType.typeName"
             label="工单类型"
-            width="130"
+            width="160"
           />
           <el-table-column
             :formatter="formatcreateType"
             label="工单方式"
-            width="130"
+            width="160"
           />
           <el-table-column
             prop="taskStatusTypeEntity.statusName"
             label="工单状态"
-            width="80"
+            width="130"
           />
           <el-table-column
             prop="userName"
@@ -229,7 +229,7 @@
       <template v-slot:footer>
         <el-row type="flex" justify="center">
           <el-col :span="4">
-            <el-button size="small" @click="add">重新创建</el-button>
+            <el-button size="small" @click="add(2)">重新创建</el-button>
           </el-col>
         </el-row>
       </template>
@@ -334,18 +334,23 @@ export default {
       this.gettaskListApi()
     },
     // 新增
-    add() {
-      this.dialogVisible2 = false
-      // 显示对话框
-      this.dialogVisible = true
-      this.$refs.addTask.form.assignorId = this.form1.assignorId
-      this.$refs.addTask.form.createType = this.createType
-      this.$refs.addTask.form.innerCode = this.form1.innerCode
-      this.$refs.addTask.form.productType = this.form1.productType
-      this.$refs.addTask.form.userId = this.form1.userId
-      // this.$refs.addTask.options = { value: this.form1.taskType.type,
-      //   label: this.form1.taskType.typeName }
-      this.$refs.addTask.getoperatorList()
+    async add(num) {
+      try {
+        this.dialogVisible2 = false
+        // 显示对话框
+        this.dialogVisible = true
+        if (num === 1) {
+          await this.$refs.addTask.getoperatorList()
+        } else {
+          this.$refs.addTask.form.assignorId = this.form1.assignorId
+          this.$refs.addTask.form.createType = this.createType
+          this.$refs.addTask.form.productType = this.form1.productType
+          this.$refs.addTask.form.innerCode = this.form1.innerCode
+          this.$refs.addTask.getoperatorList()
+        }
+      } catch (error) {
+        console.log(error)
+      }
     },
     // 获取补货预警值
     async supplyAlertValue() {
@@ -379,12 +384,14 @@ export default {
     async taskInfo(taskId) {
       const res = await taskInfo(taskId)
       this.form1 = res.data
+      console.log(this.form1)
       this.createType = this.form1.createType
       this.form1.createTime = this.form1.createTime.replace('T', ' ')
       this.form1.updateTime = this.form1.updateTime.replace('T', ' ')
       this.form1.createType = this.form1.createType === 0 ? '自动' : '手动'
       this.form1.typeName = this.form1.taskType.typeName
       this.form1.statusName = this.form1.taskStatusTypeEntity.statusName
+
       if (this.form1.statusName === '待办') {
         this.dialogVisible3 = true
       } else {

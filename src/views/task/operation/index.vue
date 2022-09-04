@@ -20,22 +20,22 @@
           <el-table-column
             type="index"
             label="序号"
-            width="60"
+            width="100"
           />
           <el-table-column
             prop="taskCode"
             label="工单编号"
-            width="140"
+            width="160"
           />
           <el-table-column
             prop="innerCode"
             label="设备编号"
-            width="140"
+            width="160"
           />
           <el-table-column
             prop="taskType.typeName"
             label="工单类型"
-            width="130"
+            width="160"
           />
           <el-table-column
             :formatter="formatcreateType"
@@ -45,7 +45,7 @@
           <el-table-column
             prop="taskStatusTypeEntity.statusName"
             label="工单状态"
-            width="80"
+            width="130"
           />
           <el-table-column
             prop="userName"
