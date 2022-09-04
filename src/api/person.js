@@ -57,4 +57,34 @@ export function userInfo(id) {
     return request({
           url: `/api/user-service/user/${id}`
       })
-  }
+}
+  
+/**
+ * 人员工作量列表
+ *  **/
+export function searchUserWork(params) {
+    return request({
+        url: '/api/user-service/user/searchUserWork',
+        params
+    })
+}
+
+/**
+ * 获取用户工作量(工单统计)
+ *  **/
+export function userWorkTotal(params) {
+    return request({
+        url: '/api/task-service/task/userWork',
+        params
+    })
+}
+
+/**
+ * 获取当时工单汇总信息(人员统计头部信息)
+ *  **/
+export function todayUserInfo(data) {
+    return request({
+        url: `/api/task-service/task/taskReportInfo/${data.start}/${data.end}`,
+        data
+    })
+}
