@@ -78,7 +78,7 @@
       </el-row>
     </el-card>
     <!-- 弹窗信息 -->
-    <userInfo  ref="userInfo" :show-dialog.sync="showDialog" />
+    <userInfo ref="userInfo" :show-dialog.sync="showDialog" />
   </div>
 </template>
 
@@ -90,7 +90,7 @@ export default {
   components: { userInfo },
   data() {
     return {
-      id:'',
+      id: "",
       showDialog: false,
       total: 0,
       loading: false,
@@ -146,12 +146,13 @@ export default {
     //打开弹窗
     async checkInfo(row) {
       this.showDialog = true;
-       //console.log(row.userId);
+      // console.log(row,111);
       // console.log(typeof(row.userId));
       // this.id = row.userId;
       // console.log(this.id);
       // console.log(typeof(this.id));
-        await this.$refs.userInfo.getUserInfo(row.userId);
+      await this.$refs.userInfo.getUserInfo(row.userId);
+      // console.log(row.userId,457);
       // console.log(row);
     },
   },

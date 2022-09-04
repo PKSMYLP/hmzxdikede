@@ -22,24 +22,24 @@
         </div>
         <div class="user-work el-row">
           <div class="item el-col el-col-5">本周</div>
-          <div class="item el-col el-col-5">{{weekInfo.total}}</div>
-          <div class="item el-col el-col-5">{{weekInfo.cancelCount}}</div>
-          <div class="item el-col el-col-5">{{weekInfo.workCount}}</div>
-          <div class="item el-col el-col-5">{{weekInfo.progressTotal}}</div>
+          <div class="item el-col el-col-5">{{ weekInfo.total }}</div>
+          <div class="item el-col el-col-5">{{ weekInfo.cancelCount }}</div>
+          <div class="item el-col el-col-5">{{ weekInfo.workCount }}</div>
+          <div class="item el-col el-col-5">{{ weekInfo.progressTotal }}</div>
         </div>
         <div class="user-work el-row">
           <div class="item el-col el-col-5">本月</div>
-          <div class="item el-col el-col-5">{{monthInfo.total}}</div>
-          <div class="item el-col el-col-5">{{monthInfo.cancelCount}}</div>
-          <div class="item el-col el-col-5">{{monthInfo.workCount}}</div>
-          <div class="item el-col el-col-5">{{monthInfo.progressTotal}}</div>
+          <div class="item el-col el-col-5">{{ monthInfo.total }}</div>
+          <div class="item el-col el-col-5">{{ monthInfo.cancelCount }}</div>
+          <div class="item el-col el-col-5">{{ monthInfo.workCount }}</div>
+          <div class="item el-col el-col-5">{{ monthInfo.progressTotal }}</div>
         </div>
         <div class="user-work el-row">
           <div class="item el-col el-col-5">本年</div>
-          <div class="item el-col el-col-5">{{yearInfo.total}}</div>
-          <div class="item el-col el-col-5">{{yearInfo.cancelCount}}</div>
-          <div class="item el-col el-col-5">{{yearInfo.workCount}}</div>
-          <div class="item el-col el-col-5">{{yearInfo.progressTotal}}</div>
+          <div class="item el-col el-col-5">{{ yearInfo.total }}</div>
+          <div class="item el-col el-col-5">{{ yearInfo.cancelCount }}</div>
+          <div class="item el-col el-col-5">{{ yearInfo.workCount }}</div>
+          <div class="item el-col el-col-5">{{ yearInfo.progressTotal }}</div>
         </div>
       </div>
     </el-dialog>
@@ -73,29 +73,32 @@ export default {
   },
   data() {
     return {
-      userInfoList: [],
+      userInfoList: {},
       weekInfo: [],
       monthInfo: [],
       yearInfo: [],
       // 获取本周的工单数据
       page: {
-        userId: 4,
+        userId: "",
         start: startValue,
         end: endValue,
       },
       // 获取本月的工单数据
       page2: {
-        userId: 4,
+        userId: "",
         start: startValue2,
         end: endValue2,
       },
       // 获取今年的工单数据
       page3: {
-        userId: 4,
+        userId: "",
         start: startValue3,
         end: endValue3,
       },
     };
+  },
+  created() {
+    // this.getUserInfo();
   },
   methods: {
     handleClose() {
@@ -103,25 +106,29 @@ export default {
     },
     async getUserInfo(id) {
       try {
+        // console.log(id,222);
         const res = await userInfo(id);
-        //console.log(res);
+        // console.log(id, 222);
+        // console.log(res, 1111);
         this.userInfoList = res.data;
         //console.log(this.userInfoList);
-        this.userId = res.data.userId;
-        console.log(this.userId);
-        //console.log(this.userInfoList);
+        this.page.userId = this.userInfoList.userId;
+        this.page2.userId = this.userInfoList.userId;
+        this.page3.userId = this.userInfoList.userId;
+        // console.log(this.userId, 11111111);
+        // console.log(this.page, 11111);
         // 获取本周的工单数据
         const weekdata = await userWorkTotal(this.page);
         this.weekInfo = weekdata.data;
-        console.log(this.weekInfo);
+        //console.log(this.weekInfo);
         // 获取本月的工单数据
         const monthdata = await userWorkTotal(this.page2);
         this.monthInfo = monthdata.data;
-        console.log(this.monthInfo);
+        //console.log(this.monthInfo);
         // 获取今年的工单数据
         const yeardata = await userWorkTotal(this.page3);
         this.yearInfo = yeardata.data;
-        console.log(this.yearInfo);
+        //console.log(this.yearInfo);
       } catch (e) {
         console.log(e);
       }
