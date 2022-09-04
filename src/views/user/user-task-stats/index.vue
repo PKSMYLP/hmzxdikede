@@ -8,25 +8,33 @@
             <div class="body">
               <div class="stats">
                 <div class="item">
-                  <div class="num color1 text-shadow1">{{todayUserInfoList.total}}</div>
+                  <div class="num color1 text-shadow1">
+                    {{ todayUserInfoList.total }}
+                  </div>
                   <div class="text color2">工单总数（个）</div>
                 </div>
               </div>
               <div class="stats">
                 <div class="item">
-                  <div class="num color1 text-shadow1">{{todayUserInfoList.completedTotal}}</div>
+                  <div class="num color1 text-shadow1">
+                    {{ todayUserInfoList.completedTotal }}
+                  </div>
                   <div class="text color2">完成工单（个）</div>
                 </div>
               </div>
               <div class="stats">
                 <div class="item">
-                  <div class="num color1 text-shadow1">{{todayUserInfoList.cancelTotal}}</div>
+                  <div class="num color1 text-shadow1">
+                    {{ todayUserInfoList.cancelTotal }}
+                  </div>
                   <div class="text color2">拒绝工单（个）</div>
                 </div>
               </div>
               <div class="stats">
                 <div class="item">
-                  <div class="num color1 text-shadow1">{{todayUserInfoList.workerCount}}</div>
+                  <div class="num color1 text-shadow1">
+                    {{ todayUserInfoList.workerCount }}
+                  </div>
                   <div class="text color2">运营人员数（个）</div>
                 </div>
               </div>
@@ -39,25 +47,33 @@
             <div class="body2">
               <div class="stats">
                 <div class="item">
-                  <div class="num color1 text-shadow2">{{todayUserInfoList1.total}}</div>
+                  <div class="num color1 text-shadow2">
+                    {{ todayUserInfoList1.total }}
+                  </div>
                   <div class="text color3">工单总数（个）</div>
                 </div>
               </div>
               <div class="stats">
                 <div class="item">
-                  <div class="num color1 text-shadow2">{{todayUserInfoList1.completedTotal}}</div>
+                  <div class="num color1 text-shadow2">
+                    {{ todayUserInfoList1.completedTotal }}
+                  </div>
                   <div class="text color3">完成工单（个）</div>
                 </div>
               </div>
               <div class="stats">
                 <div class="item">
-                  <div class="num color1 text-shadow2">{{todayUserInfoList1.cancelTotal}}</div>
+                  <div class="num color1 text-shadow2">
+                    {{ todayUserInfoList1.cancelTotal }}
+                  </div>
                   <div class="text color3">拒绝工单（个）</div>
                 </div>
               </div>
               <div class="stats">
                 <div class="item">
-                  <div class="num color1 text-shadow2">{{todayUserInfoList1.workerCount}}</div>
+                  <div class="num color1 text-shadow2">
+                    {{ todayUserInfoList1.workerCount }}
+                  </div>
                   <div class="text color3">运营人员数（个）</div>
                 </div>
               </div>
@@ -73,13 +89,18 @@
             <div class="title">
               <span>工单状态</span>
               <el-date-picker
-                v-model="value"
+                v-model="value2"
                 type="daterange"
                 start-placeholder="开始日期"
                 end-placeholder="结束日期"
                 :default-time="['00:00:00', '23:59:59']"
               >
               </el-date-picker>
+              <el-radio-group v-model="radio1">
+                <el-radio-button label="周"></el-radio-button>
+                <el-radio-button label="年"></el-radio-button>
+                <el-radio-button label="月"></el-radio-button>
+              </el-radio-group>
             </div>
             <div class="empty">
               <img src="../../../assets/common/人员列表3.png" alt="" />
@@ -130,9 +151,11 @@ export default {
   components: {},
   data() {
     return {
-      todayUserInfoList:"",
-      todayUserInfoList1:"",
+      radio1: "",
+      todayUserInfoList: "",
+      todayUserInfoList1: "",
       value: "",
+      value2: "",
       regionList: "",
       page: {
         pageIndex: 1, //当前页数
@@ -160,9 +183,9 @@ export default {
     async getTodayUserInfo() {
       const res = await todayUserInfo(this.time);
       //console.log(res);
-       this.todayUserInfoList= res.data[0]
+      this.todayUserInfoList = res.data[0];
       //console.log(todayUserInfoList);
-       this.todayUserInfoList1= res.data[1]
+      this.todayUserInfoList1 = res.data[1];
       //console.log(todayUserInfoList1);
     },
   },
@@ -211,7 +234,7 @@ export default {
   border-radius: 20px;
 }
 .el-range-editor.el-input__inner {
-  margin-left: 400px;
+  margin-left: 288px;
 }
 
 .text-shadow1 {
@@ -274,6 +297,11 @@ export default {
   display: flex;
   justify-content: center;
   margin-top: 10px;
+}
+.el-radio-button__inner,
+.el-radio-group {
+  margin-left: 20px;
+  background: rgba(233, 243, 255, 0.37);
 }
 </style>
   
