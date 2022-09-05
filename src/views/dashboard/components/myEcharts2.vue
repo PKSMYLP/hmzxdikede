@@ -79,7 +79,7 @@ export default {
           this.data1 = data.series.map(ele => ele / 100)
           this.data2 = data.xAxis
           return getEcharts()
-        } else if (val === 1) {
+        } else if (val === 2) {
           const { data } = await regionCollect(this.start2, this.end)
           this.data1 = data.series.map(ele => ele / 100)
           this.data2 = data.xAxis
