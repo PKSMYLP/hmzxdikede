@@ -24,17 +24,16 @@
             <el-table-column prop="address" label="地址" show-overflow-tooltip />
             <el-table-column prop="ownerName" label="合作商" show-overflow-tooltip />
             <el-table-column prop="status" label="设备状态" show-overflow-tooltip />
-            <el-table-column prop="right" label="操作" width="140">
+            <el-table-column label="操作" width="140">
               <template slot-scope="{row}">
                 <el-button type="text" size="small">
-                  <span @click="taskInfo(row.cargo)">货道</span>
-
+                  <span @click="taskCargo(row)">货道</span>
                 </el-button>
                 <el-button type="text" size="small">
-                  <span @click="taskInfo(row.tactics)">策略</span>
+                  <span @click="taskTactics(row)">策略</span>
                 </el-button>
                 <el-button type="text" size="small">
-                  <span @click="taskInfo(row.edit)">修改</span>
+                  <span @click="taskEdit(row)">修改</span>
                 </el-button>
               </template>
             </el-table-column>
@@ -47,7 +46,7 @@
         </template>
       </MyList>
       <div>
-        <!-- Form -->
+        <!-- 新增设备弹窗 -->
         <el-dialog title="新增设备" :visible.sync="dialogFormVisible" width="630px">
           <el-form ref="infoForm" :model="form" :rules="rules">
             <el-form-item label="设备编号 " width="530px" :label-width="formLabelWidth">
@@ -64,10 +63,168 @@
               </el-select>
             </el-form-item>
           </el-form>
-          <div slot="footer" class="dialog-footer">
-            <el-button @click="dialogFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
-          </div>
+          <template v-slot:footer>
+            <el-row type="flex" justify="center">
+              <el-col :span="6">
+                <el-button size="small" @click="handleFormClose">取消</el-button>
+                <el-button type="primary" size="small" @click="dialogFormVisible = false">确定</el-button>
+              </el-col>
+            </el-row>
+          </template>
+        </el-dialog>
+        <!-- 货道弹窗 -->
+        <el-dialog title="货道设置" :visible.sync="dialogCargoVisible" width="1078px">
+          <el-form ref="infoForm" :model="form" :rules="rules">
+            <el-form-item width="530px" :label-width="formLabelWidth">
+              <el-row>
+                <el-col class="cargoTop">
+                  <span>货道行数：{{ cargoTopData.vmRow }}</span>
+                  <span>货道列数：{{ cargoTopData.vmCol }}</span>
+                  <span>货道容量（个）：{{ cargoTopData.vmCol }}</span>
+                  <el-button type="primary" @click="cargoSort">智能排序</el-button>
+                </el-col>
+              </el-row>
+            </el-form-item>
+            <el-carousel>
+              <el-carousel-item>
+                <el-form-item props="type" :label-width="formLabelWidth">
+                  <el-row :gutter="20">
+                    <el-col v-for="(item, index) in cargoBottomData" :key="index" :span="6">
+                      <el-card :body-style="{ padding: '1px'}">
+                        <img :src="item.skuImage" class="image">
+                        <div style="padding: 14px;">
+                          <span>{{ item.skuName }}</span>
+                          <div class="bottom clearfix button">
+                            <el-button type="text" class="button1">添加</el-button>
+                            <el-button type="text" class="button2">删除</el-button>
+                          </div>
+                        </div>
+                      </el-card>
+                    </el-col>
+                  </el-row>
+                </el-form-item>
+              </el-carousel-item>
+            </el-carousel>
+          </el-form>
+          <template v-slot:footer>
+            <el-row type="flex" justify="center">
+              <el-col :span="4">
+                <!-- <el-button size="small" @click="handleCargoClose">取消</el-button> -->
+                <el-button type="warning" size="small" @click="dialogCargoVisible = false">确定</el-button>
+              </el-col>
+            </el-row>
+          </template>
+        </el-dialog>
+        <!-- 策略弹窗 -->
+        <el-dialog title="批量策略管理" :visible.sync="dialogTacticsVisible" width="630px">
+          <el-form ref="infoFormTactics" :model="form" :rules="rules">
+            <el-form-item v-if="!this.TacticsData.policyId" props="tactics" label="选择策略：" :label-width="formLabelWidth">
+              <el-select v-model="form.regionAddress" placeholder="请选择">
+                <el-option v-for="(item,index) in policyName" :key="index" :label="item" :value="item" />
+              </el-select>
+            </el-form-item>
+            <el-form-item v-else>
+              <template>
+                <el-row>
+                  <el-col class="tacticsRow">
+                    <span>机器编号：{{ TacticsData.innerCode }}</span>
+                    <span>策略名称：{{ TacticsData.policyName }}</span>
+                  </el-col>
+                  <el-col class="tacticsRow">
+                    <span>策略方案{{ TacticsData.discount }}%</span>
+                  </el-col>
+                </el-row>
+              </template>
+            </el-form-item>
+          </el-form>
+          <template v-slot:footer>
+            <el-row type="flex" justify="center">
+              <el-col :span="6">
+                <el-button size="small" @click="handleTacticsClose">取消策略</el-button>
+                <!-- <el-button type="warning" size="small" @click="dialogTacticsVisible = false">确定</el-button> -->
+              </el-col>
+            </el-row>
+          </template>
+        </el-dialog>
+        <!-- 修改弹窗 -->
+        <el-dialog title="修改设备" :visible.sync="dialogEditVisible" width="630px">
+          <el-form ref="infoForm" :model="form" :rules="rules">
+            <el-form-item props="edit" label="机器编号：" :label-width="formLabelWidth">
+              <el-row>
+                <el-col>{{ EditData.innerCode }}</el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item props="edit" label="供货时间：" :label-width="formLabelWidth">
+              <el-row>
+                <el-col>{{ EditData.createTime }}</el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item props="edit" label="设备类型：" :label-width="formLabelWidth">
+              <el-row>
+                <el-col>{{ EditData.type }}</el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item props="edit" label="设备容量：" :label-width="formLabelWidth">
+              <el-row>
+                <el-col>{{ vmCount }}</el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item props="edit" label="设备点位：" :label-width="formLabelWidth">
+              <el-select v-model="form.regionAddress" placeholder="请选择">
+                <el-option v-for="(item,index) in addressData" :key="index" :label="item" :value="item" />
+              </el-select>
+            </el-form-item>
+            <el-form-item props="edit" label="合作商：" :label-width="formLabelWidth">
+              <el-row>
+                <el-col>{{ EditData.ownerName }}</el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item props="edit" label="所属区域：" :label-width="formLabelWidth">
+              <el-row>
+                <el-col>{{ remark }}</el-col>
+              </el-row>
+            </el-form-item>
+            <el-form-item props="edit" label="设备地址：" :label-width="formLabelWidth">
+              <el-row>
+                <el-col>{{ EditData.address }}</el-col>
+              </el-row>
+            </el-form-item>
+          </el-form>
+          <template v-slot:footer>
+            <el-row type="flex" justify="center">
+              <el-col :span="6">
+                <el-button size="small" @click="handleEditClose">取消</el-button>
+                <el-button type="warning" size="small" @click="dialogEditVisible = false">确定</el-button>
+              </el-col>
+            </el-row>
+          </template>
+        </el-dialog>
+        <!-- 智能排序 -->
+        <el-dialog title="智能排序" :visible.sync="dialogCargoSortVisible" width="1078px">
+          <el-form>
+            <el-form-item width="530px" :label-width="formLabelWidth">
+              <div style="float:left;margin-left:-120px">该区域属于学校商圈适合销售一下商品：</div>
+            </el-form-item>
+            <el-form-item props="type" width="530px" :label-width="formLabelWidth">
+              <el-row :gutter="20">
+                <el-col v-for="(item, index) in cargoBottomData" :key="index" :span="4">
+                  <el-card :body-style="{ padding: '1px'}">
+                    <img :src="item.skuImage" class="image">
+                    <div style="padding: 14px;">
+                      <span>{{ item.skuName }}</span>
+                    </div>
+                  </el-card>
+                </el-col>
+              </el-row>
+            </el-form-item>
+          </el-form>
+          <template v-slot:footer>
+            <el-row type="flex" justify="center">
+              <el-col :span="4">
+                <el-button type="warning" size="small" @click="dialogCargoSortVisible = false">采纳建议</el-button>
+              </el-col>
+            </el-row>
+          </template>
         </el-dialog>
       </div>
     </div>
@@ -77,7 +234,7 @@
 
 <script>
 import MyHeader from '../components/myHeader.vue'
-import { getVmSearch, getSkuCollect } from '@/api'
+import { getVmSearch, getSkuCollect, getPolicy, searchVmPolicy, getNode, getChannelListC, getVmTypeDetail } from '@/api'
 import MyList from '@/components/myList/index.vue'
 import MyPagination from '@/components/myPagination/index.vue'
 import VmType from '@/api/constant/vm'
@@ -92,19 +249,15 @@ export default {
         totalCount: 0,
         totalPage: 1
       },
-      // 数据字段对应的表头标题
-      // tableData: {
-      //   innerCode: '设备编号',
-      //   type: '设备型号',
-      //   regionAddress: '详细地址',
-      //   ownerName: '合作商',
-      //   status: '设备状态'
-      // },
       multipleSelection: [],
       list: [],
       total: 0,
       VmType,
       dialogFormVisible: false,
+      dialogTacticsVisible: false,
+      dialogEditVisible: false,
+      dialogCargoVisible: false,
+      dialogCargoSortVisible: false,
       form: {
         type: '',
         regionAddress: ''
@@ -115,7 +268,14 @@ export default {
       rules: {
         typeData: [{ require: true, trigger: 'blur', message: '无匹配数据' }],
         addressData: [{ require: true, trigger: 'blur', message: '无匹配数据' }]
-      }
+      },
+      policyName: [],
+      TacticsData: [],
+      EditData: [],
+      cargoTopData: [],
+      cargoBottomData: [],
+      vmCount: '',
+      remark: ''
 
     }
   },
@@ -138,7 +298,7 @@ export default {
       // 提取数据相关信息
       this.list = data.currentPageRecords
       this.total = data.totalCount
-      // console.log(this.list)
+      console.log(this.list)
       // 处理数据
       this.handleListData()
     },
@@ -160,7 +320,6 @@ export default {
         })
         item.status = objStatus
       })
-      // console.log(this.currTasks)
     },
     changePage(value) {
       this.pageInfo.pageIndex = value
@@ -186,7 +345,72 @@ export default {
       const res = await addVm({
 
       })
-      console.log(res)
+    },
+    // 货道
+    async taskCargo(value) {
+      this.dialogCargoVisible = true
+      const res = await getVmTypeDetail(value.vmType)
+      this.cargoTopData = res.data
+      const { data } = await getChannelListC(value.innerCode)
+      data.forEach(ele => {
+        if (ele.sku) {
+          this.cargoBottomData.push(ele.sku)
+        }
+      })
+      // console.log(this.cargoBottomData)
+    },
+    // 货道---智能排序
+    cargoSort() {
+      this.dialogCargoSortVisible = true
+    },
+    async taskTactics(value) {
+      this.dialogTacticsVisible = true
+      try {
+        const res = await searchVmPolicy(value.innerCode)
+        if (!res.data.policyId) {
+          const { data } = await getPolicy({
+            innerCodeList: value.innerCode,
+            policyId: value.id
+          })
+          console.log(data)
+          data.forEach(ele => {
+            this.policyName.push(ele.policyName)
+          })
+        } else {
+          this.TacticsData = res.data
+          console.log(this.TacticsData)
+        }
+      } catch (error) {
+        console.log(error)
+      } finally {
+        this.$refs.infoFormTactics.resetFields()
+      }
+    },
+    async taskEdit(value) {
+      this.dialogEditVisible = true
+      this.EditData = value
+      this.vmCount = this.EditData.node.vmCount
+      this.remark = this.EditData.region.remark
+      console.log(value)
+      // await getNode({
+
+      // })
+    },
+    handleFormClose() {
+      this.dialogFormVisible = false
+    },
+    handleCargoClose() {
+      this.dialogCargoVisible = false
+    },
+    handleTacticsClose() {
+      this.policyName = []
+      this.dialogTacticsVisible = false
+    },
+    handleEditClose() {
+      this.dialogEditVisible = false
+    },
+    btnTacticsOk() {
+      this.handleTacticsClose()
     },
     batchBtn() { },
     handleSelectionChange() { }
@@ -196,8 +420,63 @@ export default {
 <style scoped lang="scss">
 .search {
   margin-bottom: 20px;
+  // background-image: ;
 }
 .el-select {
   width: 400px;
+}
+.tacticsRow {
+  display: flex;
+  align-content: space-between;
+  align-items: center;
+  // margin-left: 30px;
+  span {
+    padding-left: 150px;
+    padding-top: 25px;
+  }
+}
+.time {
+  font-size: 13px;
+  color: #999;
+}
+
+.bottom {
+  margin-top: 13px;
+  line-height: 12px;
+}
+
+.button {
+  padding: 0;
+  margin: 0 auto;
+}
+.button1 {
+  color: #5f84ff;
+}
+.button2 {
+  color: red;
+}
+
+.image {
+  width: 100%;
+  display: block;
+}
+
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: '';
+}
+
+.clearfix:after {
+  clear: both;
+}
+.cargoTop {
+  background-color: #f3f6fb;
+  span {
+    padding-left: 20px;
+  }
+  .el-button {
+    float: right;
+  }
 }
 </style>

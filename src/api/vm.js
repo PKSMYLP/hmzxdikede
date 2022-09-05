@@ -43,3 +43,70 @@ export const addVm = (data) => {
     data
   })
 }
+
+/**
+ * 新增策略/策略列表
+ * @param {*} data
+ * @returns
+ */
+export const getPolicy = (data) => {
+  return request({
+    url: '/api/vm-service/policy',
+    data
+  })
+}
+
+export const searchVmPolicy = (innerCode) => {
+  return request({
+    url: `/api/vm-service/policy/vmPolicy/${innerCode}`,
+    method: 'GET'
+  })
+}
+
+export const getNode = (params) => {
+  return request({
+    url: '/api/vm-service/node/search'
+  })
+}
+
+/**
+ * 获取售货机货道详情
+ * @param {*} innerCode
+ * @returns
+ */
+export const getChannelListC = (innerCode) => {
+  return request({
+    url: `/api/vm-service/channel/channelList/${innerCode}`
+  })
+}
+
+/**
+ * 售货机类型详情
+ * @param {*} typeId
+ * @returns
+ */
+export const getVmTypeDetail = (typeId) => {
+  return request({
+    url: `/api/vm-service/vmType/${typeId}`
+  })
+}
+
+/**
+ * 售货机类型删除
+ * @param {*} typeId
+ * @returns
+ */
+export const deleteVmType = (typeId) => {
+  return request({
+    url: `/api/vm-service/vmType/${typeId}`,
+    method: 'DELETE'
+  })
+}
+
+export const editVmType = (typeId, data) => {
+  return request({
+    url: ` /api/vm-service/vmType/${typeId}`,
+    method: 'PUT',
+    data
+  })
+}
