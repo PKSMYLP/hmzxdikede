@@ -10,11 +10,11 @@
         <!-- table -->
         <template slot="table">
           <el-table ref="multipleTable" :data="list" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-            <el-table-column label="序号" type="index" show-overflow-tooltip />
-            <el-table-column prop="innerCode" label="设备编号" show-overflow-tooltip />
-            <el-table-column prop="type" label="设备型号" show-overflow-tooltip />
-            <el-table-column prop="address" label="地址" show-overflow-tooltip />
-            <el-table-column prop="vmStatus" label="运营状态" width="120" />
+            <el-table-column width="80" label="序号" type="index" show-overflow-tooltip />
+            <el-table-column width="160" prop="innerCode" label="设备编号" show-overflow-tooltip />
+            <el-table-column width="160" prop="type" label="设备型号" show-overflow-tooltip />
+            <el-table-column width="160" prop="address" label="地址" show-overflow-tooltip />
+            <el-table-column prop="vmStatus" label="运营状态" width="150" />
             <el-table-column prop="status" label="设备状态" show-overflow-tooltip>
               <el-row>
                 <el-button type="warning" round>离线</el-button>

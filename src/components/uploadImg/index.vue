@@ -1,6 +1,21 @@
 <template>
   <div>
-    <el-upload v-loading="loading" element-loading-text="上传中" element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.8)" action="#" :file-list="fileList" list-type="picture-card" :on-change="onChange" :http-request="oRequest" :on-remove="onRemove" :on-preview="onPreview" :before-upload="beforeUpload" :limit="1" :class="fileList.length === 1 ? 'hideAdd' : ''">
+    <el-upload
+      v-loading="loading"
+      element-loading-text="上传中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
+      action="#"
+      :file-list="fileList"
+      list-type="picture-card"
+      :on-change="onChange"
+      :http-request="oRequest"
+      :on-remove="onRemove"
+      :on-preview="onPreview"
+      :before-upload="beforeUpload"
+      :limit="1"
+      :class="fileList.length === 1 ? 'hideAdd' : ''"
+    >
       <i class="el-icon-plus" />
     </el-upload>
     <el-dialog title="图片预览" :visible.sync="previewImgDialogVisible">
@@ -49,7 +64,7 @@ export default {
         Key: data.file.name, /* 存储在桶里的对象键（例如1.jpg，a/b/test.txt），必须字段 */
         StorageClass: 'STANDARD',
         Body: data.file, // 上传文件对象
-        onProgress: function (progressData) {
+        onProgress: function(progressData) {
           console.log(JSON.stringify(progressData))
         }
       }, (err, data) => {
