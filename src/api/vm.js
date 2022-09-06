@@ -43,6 +43,18 @@ export const addVm = (data) => {
     data
   })
 }
+/**
+ * 新增售货机类型
+ * @param {*} data
+ * @returns
+ */
+export const addVmType = (data) => {
+  return request({
+    url: '/api/vm-service/vmType',
+    method: 'POST',
+    data
+  })
+}
 
 /**
  * 新增策略/策略列表
@@ -56,6 +68,11 @@ export const getPolicy = (data) => {
   })
 }
 
+/**
+ * 查询售货机策略
+ * @param {*} innerCode
+ * @returns
+ */
 export const searchVmPolicy = (innerCode) => {
   return request({
     url: `/api/vm-service/policy/vmPolicy/${innerCode}`,
@@ -63,6 +80,11 @@ export const searchVmPolicy = (innerCode) => {
   })
 }
 
+/**
+ * 点位搜索
+ * @param {*} params
+ * @returns
+ */
 export const getNode = (params) => {
   return request({
     url: '/api/vm-service/node/search'
@@ -103,10 +125,43 @@ export const deleteVmType = (typeId) => {
   })
 }
 
+/**
+ *售货机类型修改
+ *
+ * @param {*} typeId
+ * @param {*} data
+ * @returns
+ */
 export const editVmType = (typeId, data) => {
   return request({
-    url: ` /api/vm-service/vmType/${typeId}`,
+    url: `/api/vm-service/vmType/${typeId}`,
     method: 'PUT',
     data
+  })
+}
+
+/**
+ * 取消策略
+ * @param {*} innerCode
+ * @param {*} policyId
+ * @returns
+ */
+export const cacancelPolicy = (innerCode, policyId) => {
+  return request({
+    url: `/api/vm-service/vm/cancelPolicy/${innerCode}/${policyId}`,
+    method: 'PUT'
+  })
+}
+
+/**
+ * 修改售货机点位
+ * @param {*} id
+ * @param {*} nodeId
+ * @returns
+ */
+export const editVmNode = (id, nodeId) => {
+  return request({
+    url: `/api/vm-service/vm/${id}/${nodeId}`,
+    method: 'PUT'
   })
 }

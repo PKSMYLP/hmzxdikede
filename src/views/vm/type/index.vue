@@ -9,7 +9,7 @@
       <MyList :list="list">
         <!-- 新增、批量处理 -->
         <template slot="after">
-          <el-button type="warning" icon="el-icon-circle-plus-outline" style="margin-right: 10px" @click="taskEdit">新增</el-button>
+          <el-button type="warning" icon="el-icon-circle-plus-outline" style="margin-right: 10px" @click="taskEdit">新建</el-button>
         </template>
 
         <!-- table -->
@@ -45,9 +45,9 @@
         </template>
       </MyList>
       <div>
-        <!-- 修改弹窗 -->
+        <!-- 修改/新建 弹窗 -->
         <el-dialog :title="titleTypeData" :visible.sync="dialogFormVisible" width="630px">
-          <el-form :model="form">
+          <el-form ref="formEdit" :model="form">
             <el-form-item class="maxValue" prop="name" label="型号名称:" :rules="[{required:true,trigger: 'blur'}]">
               <el-input v-model="form.name" size="large" placeholder="请输入" />
             </el-form-item>
@@ -73,8 +73,8 @@
           <template v-slot:footer>
             <el-row type="flex" justify="center">
               <el-col :span="6">
-                <el-button size="small" @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="warning" size="small" @click="dialogFormVisible = false">确定</el-button>
+                <el-button size="small" @click="handleEditClose">取消</el-button>
+                <el-button type="warning" size="small" @click="btnEditOk ">确定</el-button>
               </el-col>
             </el-row>
           </template>
@@ -86,7 +86,7 @@
 
 <script>
 import MyHeader from '../components/myHeader.vue'
-import { getVmTypeSearch, getSkuCollect, deleteVmType, getVmTypeDetail } from '@/api'
+import { getVmTypeSearch, addVmType, deleteVmType, editVmType, getVmTypeDetail } from '@/api'
 import MyList from '@/components/myList/index.vue'
 import MyPagination from '@/components/myPagination/index.vue'
 import VmType from '@/api/constant/vm'
@@ -113,6 +113,7 @@ export default {
         image: '',
         vmRow: '',
         vmCol: '',
+        typeId: '',
         channelMaxCapacity: ''
       },
       // form: [],
@@ -159,6 +160,7 @@ export default {
         item.image
         item.vmRow
         item.vmCol
+        item.typeId
         item.channelMaxCapacity
       })
     },
@@ -183,22 +185,21 @@ export default {
     // titleTypeData: '新增设备类型'
     async taskEdit(value) {
       this.dialogFormVisible = true
-      if (value.typeId) {
-        this.titleTypeData = '修改设备类型'
-        const res = this.list.filter(ele => ele.typeId === value.typeId)
-        this.form.name = res[0].name
-        this.form.model = res[0].model
-        this.form.vmRow = res[0].vmRow
-        this.form.vmCol = res[0].vmCol
-        this.form.channelMaxCapacity = res[0].channelMaxCapacity
-        this.form.image = res[0].image
-
-        getVmTypeDetail(value.typeId)
-        // console.log('form', this.form)
-      } else {
-        // const res = await addVm({
-
-        // })
+      this.getFirstPage()
+      try {
+        if (value.typeId) {
+          this.titleTypeData = '修改设备类型'
+          const res = this.list.filter(ele => ele.typeId === value.typeId)
+          this.form.name = res[0].name
+          this.form.model = res[0].model
+          this.form.vmRow = res[0].vmRow
+          this.form.typeId = res[0].typeId
+          this.form.vmCol = res[0].vmCol
+          this.form.channelMaxCapacity = res[0].channelMaxCapacity
+          this.form.image = res[0].image
+        }
+      } catch (error) {
+        console.log(error)
       }
       // await this.$refs.infoForm.validate()
     },
@@ -206,6 +207,7 @@ export default {
       try {
         const res = await deleteVmType(value.typeId)
         this.$message.success('删除成功')
+        this.getFirstPage()
         console.log(res)
       } catch (error) {
         this.$message.error('该售货机类型在使用')
@@ -214,7 +216,35 @@ export default {
     headerSuccess() {
       this.$refs.staffPhoto.imgUrl = this.form.image
     },
-    batchBtn() { },
+    async btnEditOk() {
+      try {
+        console.log(!this.form.model)
+        if (!this.form.model) {
+          await addVmType(this.form)
+          this.$message.success('新建成功')
+        } else {
+          this.getFirstPage()
+          await editVmType(this.form.typeId, this.form)
+          this.$message.success('修改成功')
+        }
+        this.handleEditClose()
+      } catch (error) {
+        this.$message.error('该售货机类型正在使用')
+      } finally {
+        this.getFirstPage()
+      }
+    },
+    handleEditClose() {
+      this.dialogFormVisible = false
+      this.form = {
+        name: '',
+        model: '',
+        image: '',
+        vmRow: '',
+        vmCol: '',
+        channelMaxCapacity: ''
+      }
+    },
     handleSelectionChange() { }
   }
 }

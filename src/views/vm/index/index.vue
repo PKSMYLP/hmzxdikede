@@ -11,13 +11,13 @@
         <template slot="after">
           <el-button type="warning" icon="el-icon-circle-plus-outline" style="margin-right: 10px" @click="add">新增</el-button>
 
-          <el-button type="info" @click="batchBtn">批量处理</el-button>
+          <el-button type="info" @click="batchBtn([list])">批量处理</el-button>
         </template>
 
         <!-- table -->
         <template slot="table">
           <el-table ref="multipleTable" :data="list" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
-            <el-table-column type="selection" width="55" />
+            <el-table-column v-model="checkbox" type="selection" width="55" @click="toggleSelection" />
             <el-table-column label="序号" type="index" show-overflow-tooltip />
             <el-table-column prop="innerCode" label="设备编号" show-overflow-tooltip />
             <el-table-column prop="type" label="设备型号" show-overflow-tooltip />
@@ -67,7 +67,7 @@
             <el-row type="flex" justify="center">
               <el-col :span="6">
                 <el-button size="small" @click="handleFormClose">取消</el-button>
-                <el-button type="primary" size="small" @click="dialogFormVisible = false">确定</el-button>
+                <el-button type="primary" size="small" @click="btnAddVmOK">确定</el-button>
               </el-col>
             </el-row>
           </template>
@@ -137,10 +137,18 @@
               </template>
             </el-form-item>
           </el-form>
-          <template v-slot:footer>
+          <template v-if="!this.TacticsData.policyId" v-slot:footer>
             <el-row type="flex" justify="center">
               <el-col :span="6">
-                <el-button size="small" @click="handleTacticsClose">取消策略</el-button>
+                <el-button size="small" @click="handleTacticsClose">取消</el-button>
+                <el-button type="warning" size="small" @click="dialogTacticsVisible = false">确定</el-button>
+              </el-col>
+            </el-row>
+          </template>
+          <template v-else v-slot:footer>
+            <el-row type="flex" justify="center">
+              <el-col :span="6">
+                <el-button size="small" @click="handleTacticsCancel">取消策略</el-button>
                 <!-- <el-button type="warning" size="small" @click="dialogTacticsVisible = false">确定</el-button> -->
               </el-col>
             </el-row>
@@ -194,7 +202,7 @@
             <el-row type="flex" justify="center">
               <el-col :span="6">
                 <el-button size="small" @click="handleEditClose">取消</el-button>
-                <el-button type="warning" size="small" @click="dialogEditVisible = false">确定</el-button>
+                <el-button type="warning" size="small" @click="btnEditOk">确定</el-button>
               </el-col>
             </el-row>
           </template>
@@ -234,7 +242,7 @@
 
 <script>
 import MyHeader from '../components/myHeader.vue'
-import { getVmSearch, getSkuCollect, getPolicy, searchVmPolicy, getNode, getChannelListC, getVmTypeDetail } from '@/api'
+import { getVmSearch, getVmTypeSearch, getPolicy, searchVmPolicy, addVm, getNode, getChannelListC, getVmTypeDetail, cacancelPolicy, editVmNode } from '@/api'
 import MyList from '@/components/myList/index.vue'
 import MyPagination from '@/components/myPagination/index.vue'
 import VmType from '@/api/constant/vm'
@@ -263,8 +271,8 @@ export default {
         regionAddress: ''
       },
       formLabelWidth: '120px',
-      typeData: ['饮料机', '综合机', '零食机', '果蔬机', '电子产品', '果汁机', '灯具', '茶叶机'],
-      addressData: ['北京悦荟广场', '凯德MALL', '枫蓝国际购物中心', '西单大悦城', '龙旗购物中心', '三旗百汇购物中心', '上品折扣', '华联商厦', , '路劲世界城广场', '新世纪商城', '八达岭奥特莱斯', '翠微百货', '金燕龙写字楼一层', '金燕龙写字楼二层', '金燕龙写字楼三层', '金燕龙写字楼四层', '阿迪斯发的', '华联商厦', '123'],
+      typeData: [],
+      addressData: [],
       rules: {
         typeData: [{ require: true, trigger: 'blur', message: '无匹配数据' }],
         addressData: [{ require: true, trigger: 'blur', message: '无匹配数据' }]
@@ -272,11 +280,13 @@ export default {
       policyName: [],
       TacticsData: [],
       EditData: [],
+      AddVmData: [],
       cargoTopData: [],
       cargoBottomData: [],
       vmCount: '',
-      remark: ''
-
+      remark: '',
+      nodeId: [],
+      vmType: []
     }
   },
   computed: {},
@@ -298,7 +308,7 @@ export default {
       // 提取数据相关信息
       this.list = data.currentPageRecords
       this.total = data.totalCount
-      console.log(this.list)
+      // console.log(this.list)
       // 处理数据
       this.handleListData()
     },
@@ -339,12 +349,64 @@ export default {
         return
       })
     },
+    // 打开新增弹窗并数据回显
+    async getVmTypeSearch() {
+      try {
+        const { data: { currentPageRecords } } = await getVmTypeSearch({
+          pageIndex: 1,
+          pageSize: 100000
+        })
+        currentPageRecords.forEach(ele => {
+          this.typeData.push(ele.name)
+        })
+        const { data: { currentPageRecords: addressData } } = await getNode({
+          pageIndex: 1,
+          pageSize: 100000
+        })
+        addressData.forEach(ele => {
+          this.addressData.push(ele.name)
+        })
+      } catch (error) {
+        console.log(error)
+      }
+    },
     async add() {
       this.dialogFormVisible = true
-      await this.$refs.infoForm.validate()
-      const res = await addVm({
-
+      this.getVmTypeSearch()
+    },
+    // 点击新建
+    async btnAddVmOK() {
+      const { data } = await getVmSearch(
+        { pageIndex: this.pageInfo.pageIndex, pageSize: 10000 }
+      )
+      for (const key in this.pageInfo) {
+        this.pageInfo[key] = parseInt(data[key])
+      }
+      // 提取数据相关信息
+      this.AddVmData = data.currentPageRecords
+      // console.log(this.form.regionAddress)
+      this.AddVmData.some(ele => {
+        // console.log(ele)
+        if (ele.type.name === this.form.type && ele.node.name === this.form.regionAddress) {
+          this.nodeId.push(ele.nodeId)
+          this.vmType.push(ele.vmType)
+        }
+        console.log(this.nodeId)
+        console.log(this.vmType)
       })
+      // this.nodeId = this.nodeId[0]
+      // this.vmType = parseInt(this.vmType[0])
+      // console.log(this.nodeId)
+      // console.log(this.vmType)
+      const res = await addVm({
+        createUserId: 1,
+        nodeId: 1,
+        vmType: 2
+      })
+      console.log(res)
+      // this.$message.success('新增成功')
+      // this.dialogFormVisible = false
+      // await this.$refs.infoForm.validate()
     },
     // 货道
     async taskCargo(value) {
@@ -372,13 +434,13 @@ export default {
             innerCodeList: value.innerCode,
             policyId: value.id
           })
-          console.log(data)
+          // console.log(data)
           data.forEach(ele => {
             this.policyName.push(ele.policyName)
           })
         } else {
           this.TacticsData = res.data
-          console.log(this.TacticsData)
+          // console.log(this.TacticsData)
         }
       } catch (error) {
         console.log(error)
@@ -391,10 +453,8 @@ export default {
       this.EditData = value
       this.vmCount = this.EditData.node.vmCount
       this.remark = this.EditData.region.remark
-      console.log(value)
-      // await getNode({
-
-      // })
+      this.getVmTypeSearch()
+      // console.log('this.EditData', this.addressData)
     },
     handleFormClose() {
       this.dialogFormVisible = false
@@ -406,14 +466,49 @@ export default {
       this.policyName = []
       this.dialogTacticsVisible = false
     },
+    async handleTacticsCancel(val) {
+      this.taskTactics()
+      try {
+        await cacancelPolicy(
+          this.TacticsData.innerCode,
+          this.TacticsData.policyId
+        )
+        this.$message.success('取消策略成功')
+      } catch (error) {
+        this.$message.error('取消策略失败，请重试')
+      } finally {
+        this.dialogTacticsVisible = false
+      }
+    },
     handleEditClose() {
       this.dialogEditVisible = false
+    },
+    // 批量处理
+    async btnEditOk() {
+      console.log('form', this.EditData)
+      try {
+        await editVmNode(this.EditData.id, this.EditData.nodeId)
+        this.$message.success('修改成功')
+      } catch (error) {
+        this.$message.error('该设备正在运营')
+      } finally {
+        this.handleEditClose()
+      }
     },
     btnTacticsOk() {
       this.handleTacticsClose()
     },
-    batchBtn() { },
-    handleSelectionChange() { }
+    batchBtn(row) {
+      if (!this.multipleSelection.length) {
+        this.$message.error('请勾选售货机')
+      } else {
+        this.taskTactics()
+      }
+      console.log(row)
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    }
   }
 }
 </script>
