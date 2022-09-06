@@ -24,7 +24,7 @@ const service = axios.create({
 service.interceptors.request.use(config => {
   // 添加token
   if (store.getters.token) {
-    console.log(store)
+    //console.log(store)
     if (tokenTimeOut()) {
       // 判断token 是否过期
       store.dispatch('user/logout')

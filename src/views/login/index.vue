@@ -34,7 +34,7 @@
           <span class="svg-container">
             <svg-icon icon-class="password" />
           </span>
-          <el-input v-model="loginForm.code" placeholder="请输入验证码" />
+          <el-input @keyup.enter.native="handleLogin" v-model="loginForm.code" placeholder="请输入验证码" />
         </el-form-item>
         <div class="code2 el-col el-col-9" @click="getCode">
           <img :src="imgUrl" alt="">
