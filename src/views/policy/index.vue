@@ -15,12 +15,12 @@
         <el-table-column
           prop="policyName"
           label="策略名称"
-          width="450"
+          width="300"
         />
         <el-table-column
           prop="discount"
           label="策略方案"
-          width="450"
+          width="300"
         />
         <el-table-column
           prop="createTime"
