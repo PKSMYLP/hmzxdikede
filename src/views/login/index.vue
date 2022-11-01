@@ -1,4 +1,4 @@
-<template>
+i<template>
   <div class="login-container">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" label-position="left">
 
@@ -29,6 +29,7 @@
         </span>
       </el-form-item>
       <!-- 验证码 -->
+      
       <div class="code el-row">
         <el-form-item class=" el-col el-col-15" prop="code">
           <span class="svg-container">
@@ -36,8 +37,8 @@
           </span>
           <el-input @keyup.enter.native="handleLogin" v-model="loginForm.code" placeholder="请输入验证码" />
         </el-form-item>
-        <div class="code2 el-col el-col-9" @click="getCode">
-          <img :src="imgUrl" alt="">
+        <div class="code2 el-col el-col-9">
+          <img :src="`/api/user-service/user/imageCode/${loginForm.clientToken}`" alt="">
         </div>
       </div>
 
@@ -49,19 +50,18 @@
 </template>
 
 <script>
-import { verificationCodeApi } from '@/api/user'
-
+import {imageCode} from "@/api/img"
 export default {
   name: 'Login',
   data() {
     return {
       loginForm: {
+        loading: false,
         loginName: 'admin',
         password: 'admin',
         code: '',
         loginType: 0,
-        // clientToken: null,
-        clientToken: Math.random()
+        clientToken: ''
       },
       loginRules: {
         loginName: [{ required: true, trigger: 'blur' }],
@@ -74,11 +74,15 @@ export default {
       imgUrl: ''
     }
   },
-  async created() {
-    const res = await verificationCodeApi(this.loginForm.clientToken)
-    this.imgUrl = res.config.url
+   mounted() {
+    this.getImageCode()
   },
   methods: {
+    async getImageCode() {
+     const radomNum = Math.round(Math.random() * 100);
+     const res =await imageCode(radomNum)
+     console.log(res);
+    },
     showPwd() {
       if (this.passwordType === 'password') {
         this.passwordType = ''
@@ -104,10 +108,7 @@ export default {
     },
     // 获取验证码
     async getCode() {
-      this.loginForm.clientToken = Math.random()
-      const res = await verificationCodeApi(this.loginForm.clientToken)
-      // this.imgUrl = res.config.url
-      this.imgUrl = window.URL.createObjectURL(res.data)
+    this.getImageCode()
     }
   }
 }
